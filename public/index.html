@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir K3 - Madrasah Istiqlal Jakarta</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <!--  -->
+            <h1>Formulir Identifikasi Bahaya, Penilaian dan Pengendalian Risiko K3</h1>
+            <h2>Madrasah Istiqlal Jakarta</h2>
+        </header>
+
+        <form id="k3-form">
+            
+            <!-- Bagian 1: Informasi Utama -->
+            <fieldset>
+                <legend>1. Informasi Kegiatan</legend>
+                <div class="grid-2">
+                    <div>
+                        <label for="pelaksana">Pelaksana / PJ Kegiatan</label>
+                        <input type="text" id="pelaksana" name="pelaksana" required>
+                    </div>
+                    <div>
+                        <label for="satker">Satker / Satdik</label>
+                        <select id="satker" name="satker" required>
+                            <option value="">Pilih Satker/Satdik...</option>
+                            <option value="KB">KB</option>
+                            <option value="RA">RA</option>
+                            <option value="MI">MI</option>
+                            <option value="MTs">MTs</option>
+                            <option value="MA">MA</option>
+                            <option value="IBS">IBS</option>
+                            <option value="Bag. PM">Bag. PM</option>
+                            <option value="Bag. KHK">Bag. KHK</option>
+                            <option value="Bag. TU & Umum">Bag. TU & Umum</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="namaKegiatan">Nama Kegiatan</label>
+                    <input type="text" id="namaKegiatan" name="namaKegiatan" required>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <label for="tanggalPenilaian">Tanggal Penilaian / Survei</label>
+                        <input type="date" id="tanggalPenilaian" name="tanggalPenilaian" required>
+                    </div>
+                    <div>
+                        <label for="tanggalKegiatan">Rencana Tanggal Kegiatan</label>
+                        <input type="date" id="tanggalKegiatan" name="tanggalKegiatan" required>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Bagian 2: Identifikasi Bahaya -->
+            <fieldset>
+                <legend>2. Identifikasi Bahaya, Penilaian dan Pengendalian Risiko (Form 094)</legend>
+                <div class="table-wrapper">
+                    <table id="bahaya-table">
+                        <thead>
+                            <tr>
+                                <th>Identifikasi Bahaya</th>
+                                <th>Risiko</th>
+                                <th>Peluang (A-E)</th>
+                                <th>Akibat (1-5)</th>
+                                <th>Tingkat Risiko</th>
+                                <th>Pengendalian Risiko</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bahaya-list">
+                            <!-- Baris akan ditambahkan oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" id="add-bahaya" class="btn btn-secondary">+ Tambah Baris Bahaya</button>
+            </fieldset>
+
+            <!-- Bagian 3: Inspeksi Rambu -->
+            <fieldset>
+                <legend>3. Inspeksi Rambu K3 (Form 095)</legend>
+                <div class="table-wrapper wide">
+                    <table id="rambu-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Rambu</th>
+                                <th>Lokasi</th>
+                                <th>Jenis</th>
+                                <th>Kondisi: Jelas Terbaca</th>
+                                <th>Kondisi: Posisi Rambu</th>
+                                <th>Kondisi: Kebersihan</th>
+                                <th>Total Skor</th>
+                                <th>Hasil</th>
+                                <th>Tindakan Perbaikan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rambu-list">
+                            <!-- Baris akan ditambahkan oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" id="add-rambu" class="btn btn-secondary">+ Tambah Baris Rambu</button>
+            </fieldset>
+
+            <!-- Tombol Submit Utama -->
+            <div class="submit-area">
+                <button type="submit" id="submit-button" class="btn btn-primary">Submit Laporan</button>
+                <div id="status-message"></div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Template untuk Baris Bahaya (Form 094) -->
+    <template id="bahaya-template">
+        <tr class="bahaya-row">
+            <td><textarea name="identifikasi" rows="3" required></textarea></td>
+            <td><textarea name="risiko" rows="3" required></textarea></td>
+            <td>
+                <select name="peluang" required>
+                    <option value="">Pilih</option>
+                    <option value="A">A: Hampir pasti</option>
+                    <option value="B">B: Cenderung</option>
+                    <option value="C">C: Mungkin</option>
+                    <option value="D">D: Kecil kemungkinan</option>
+                    <option value="E">E: Sangat jarang</option>
+                </select>
+            </td>
+            <td>
+                <select name="akibat" required>
+                    <option value="">Pilih</option>
+                    <option value="1">1: Tidak ada cidera</option>
+                    <option value="2">2: Cidera ringan</option>
+                    <option value="3">3: Hilang hari kerja</option>
+                    <option value="4">4: Cacat</option>
+                    <option value="5">5: Fatality</option>
+                </select>
+            </td>
+            <td><output name="tingkatRisiko" class="risk-output">-</output></td>
+            <td><textarea name="pengendalian" rows="3" required></textarea></td>
+            <td><button type="button" class="btn-remove" onclick="removeRow(this)">Hapus</button></td>
+        </tr>
+    </template>
+
+    <!-- Template untuk Baris Rambu (Form 095) -->
+    <template id="rambu-template">
+        <tr class="rambu-row">
+            <td><input type="text" name="namaRambu" required></td>
+            <td><input type="text" name="lokasi" required></td>
+            <td>
+                <select name="jenisRambu" required>
+                    <option value="">Pilih</option>
+                    <option value="Tempel">Tempel</option>
+                    <option value="Gantung">Gantung</option>
+                    <option value="Berdiri">Berdiri</option>
+                </select>
+            </td>
+            <td class="checkbox-group">
+                <label><input type="checkbox" name="jelas_a"> A. Tulisan Utuh</label>
+                <label><input type="checkbox" name="jelas_b"> B. Tidak Pudar</label>
+                <label><input type="checkbox" name="jelas_c"> C. Bisa Dilihat</Jelas</label>
+            </td>
+            <td class="checkbox-group">
+                <label><input type="checkbox" name="posisi_a"> A. Tepat Lokasi</label>
+                <label><input type="checkbox" name="posisi_b"> B. Tidak Bergeser</label>
+                <label><input type="checkbox" name="posisi_c"> C. Tidak Hilang/Jatuh</label>
+            </td>
+            <td class="checkbox-group">
+                <label><input type="checkbox" name="bersih_a"> A. Bersih</label>
+                <label><input type="checkbox" name="bersih_b"> B. Tidak Berdebu</label>
+                <label><input type="checkbox" name="bersih_c"> C. Tidak Berkarat</label>
+            </td>
+            <td><output name="totalSkor" class="score-output">0</output></td>
+            <td><output name="hasil" class="result-output">-</output></td>
+            <td><textarea name="tindakanPerbaikan" rows="3"></textarea></td>
+            <td><button type="button" class="btn-remove" onclick="removeRow(this)">Hapus</button></td>
+        </tr>
+    </template>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <!-- Script Aplikasi Anda -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>

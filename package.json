@@ -1,0 +1,29 @@
+{
+  "name": "mij-k3-app",
+  "version": "1.0.0",
+  "description": "Formulir K3 Madrasah Istiqlal Jakarta",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "k3",
+    "firebase",
+    "pdf",
+    "madrasah istiqlal"
+  ],
+  "author": "Gemini AI",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "firebase-admin": "^11.5.0",
+    "puppeteer": "^19.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
