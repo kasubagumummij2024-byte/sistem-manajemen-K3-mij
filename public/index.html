@@ -13,14 +13,47 @@
 
     <div class="container">
         <header>
-            <!--  -->
             <h1>Formulir Identifikasi Bahaya, Penilaian dan Pengendalian Risiko K3</h1>
             <h2>Madrasah Istiqlal Jakarta</h2>
         </header>
 
+        <!-- Bagian Login Admin -->
+        <div id="auth-section">
+            <form id="login-form">
+                <label for="email">Email Admin:</label>
+                <input type="email" id="email" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+                <button type="submit" class="btn btn-admin">Login</button>
+            </form>
+            <div id="user-info" class="hidden">
+                <p id="user-email"></p>
+                <button id="logout-button" class="btn btn-secondary">Logout</button>
+            </div>
+            <div id="auth-status"></div>
+        </div>
+
+        <!-- Area Download Petugas (Rekap PDF Bulanan) -->
+        <div id="admin-area" class="admin-area hidden">
+            <h3>Rekap Laporan PDF Bulanan</h3>
+            <p>Pilih bulan dan tahun untuk mengunduh semua laporan PDF dalam satu file .zip.</p>
+            <div class="rekap-controls">
+                <div class="rekap-select">
+                    <label for="rekap-bulan">Bulan:</label>
+                    <select id="rekap-bulan"></select>
+                </div>
+                <div class="rekap-select">
+                    <label for="rekap-tahun">Tahun:</label>
+                    <select id="rekap-tahun"></select>
+                </div>
+                <button id="download-rekap-pdf-btn" class="btn btn-admin">Download Rekap (.zip)</button>
+            </div>
+            <div id="rekap-status"></div>
+        </div>
+
         <form id="k3-form">
             
-            <!-- Bagian 1: Informasi Utama -->
+            <!-- Bagian 1: Informasi Kegiatan -->
             <fieldset>
                 <legend>1. Informasi Kegiatan</legend>
                 <div class="grid-2">
@@ -48,6 +81,12 @@
                     <label for="namaKegiatan">Nama Kegiatan</label>
                     <input type="text" id="namaKegiatan" name="namaKegiatan" required>
                 </div>
+                
+                <div>
+                    <label for="lokasiKegiatan">Lokasi Kegiatan / Survei</label>
+                    <input type="text" id="lokasiKegiatan" name="lokasiKegiatan" required>
+                </div>
+
                 <div class="grid-2">
                     <div>
                         <label for="tanggalPenilaian">Tanggal Penilaian / Survei</label>
@@ -76,9 +115,7 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="bahaya-list">
-                            <!-- Baris akan ditambahkan oleh JS -->
-                        </tbody>
+                        <tbody id="bahaya-list"></tbody>
                     </table>
                 </div>
                 <button type="button" id="add-bahaya" class="btn btn-secondary">+ Tambah Baris Bahaya</button>
@@ -103,9 +140,7 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="rambu-list">
-                            <!-- Baris akan ditambahkan oleh JS -->
-                        </tbody>
+                        <tbody id="rambu-list"></tbody>
                     </table>
                 </div>
                 <button type="button" id="add-rambu" class="btn btn-secondary">+ Tambah Baris Rambu</button>
@@ -167,7 +202,7 @@
             <td class="checkbox-group">
                 <label><input type="checkbox" name="jelas_a"> A. Tulisan Utuh</label>
                 <label><input type="checkbox" name="jelas_b"> B. Tidak Pudar</label>
-                <label><input type="checkbox" name="jelas_c"> C. Bisa Dilihat</Jelas</label>
+                <label><input type="checkbox" name="jelas_c"> C. Bisa Dilihat</label>
             </td>
             <td class="checkbox-group">
                 <label><input type="checkbox" name="posisi_a"> A. Tepat Lokasi</label>
@@ -191,7 +226,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    <!-- Script Aplikasi Anda -->
-    <script type="module" src="app.js"></script>
+    <!-- Script Aplikasi -->
+    <script src="app.js"></script>
+
 </body>
 </html>

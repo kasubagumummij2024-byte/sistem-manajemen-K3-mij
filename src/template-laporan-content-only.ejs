@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Konten Laporan K3 - <%= data.namaKegiatan %></title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt; 
+            line-height: 1.3; 
+            color: #333;
+            margin: 0; 
+            padding: 0;
+        }
+        .page-content {
+            width: 100%;
+            padding: 0; 
+        }
+
+        /* (DIMODIFIKASI) Judul formulir di tengah */
+        .form-title {
+            font-size: 14pt; /* Sedikit lebih kecil dari header utama */
+            font-weight: bold;
+            text-align: center; /* Pastikan di tengah */
+            margin-top: 1rem; 
+            margin-bottom: 1rem; /* Kurangi margin bawah */
+            /* Hapus border bawah jika tidak diinginkan di judul */
+            /* border-bottom: 1.5px solid #666; */
+            /* padding-bottom: 3px; */
+        }
+        
+        /* --- Tabel Info Utama --- */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            border: 1px solid #999;
+        }
+        .info-table td {
+            padding: 5px 8px; 
+            border: 1px solid #999;
+            font-size: 9pt;
+        }
+        .info-table td:first-child {
+            font-weight: bold;
+            width: 180px; 
+            background-color: #f4f4f4;
+        }
+
+        /* --- Tabel Data --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #333;
+            padding: 5px 7px; 
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+            font-size: 8pt; 
+        }
+        .data-table th {
+            background-color: #e0e0e0;
+            font-weight: bold;
+            font-size: 8pt;
+        }
+        
+        /* Widths untuk Landscape */
+        .data-table .col-bahaya { width: 15%; }
+        .data-table .col-risiko { width: 15%; }
+        .data-table .col-peluang { width: 5%; text-align: center; }
+        .data-table .col-akibat { width: 5%; text-align: center; }
+        .data-table .col-tingkat { width: 8%; text-align: center; }
+        .data-table .col-pengendalian { width: 32%; }
+
+        .data-table .col-rambu { width: 15%; }
+        .data-table .col-lokasi { width: 15%; }
+        .data-table .col-jenis { width: 10%; }
+        .data-table .col-kondisi { width: 15%; font-size: 7pt; line-height: 1.2;} 
+        .data-table .col-skor { width: 6%; text-align: center; }
+        .data-table .col-hasil { width: 8%; text-align: center; }
+        .data-table .col-tindakan { width: 16%; }
+
+        /* --- Tabel Kunci/Footer --- */
+        .key-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem; 
+            font-size: 7pt; 
+            line-height: 1.2;
+            border: 1px solid #aaa;
+        }
+        .key-table th, .key-table td {
+            border: 1px solid #aaa;
+            padding: 3px 5px;
+            text-align: left;
+            vertical-align: top;
+        }
+         .key-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+         }
+        
+        /* --- Tanda Tangan --- */
+        .signature-block {
+            margin-top: 1.5rem; 
+            width: 100%;
+            display: table;
+            table-layout: fixed;
+            margin-bottom: 20px; 
+        }
+        .signature-col {
+            display: table-cell;
+            text-align: center;
+            width: 33.3%;
+            padding: 0 0.5rem; 
+        }
+        .signature-col p {
+            margin: 0; padding: 0; font-size: 9pt; 
+        }
+        .signature-box {
+            height: 50px; 
+            margin: 0.3rem 0;
+            border-bottom: 1px solid #999;
+        }
+        .signature-name {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Konten Halaman 1: Form 094 -->
+    <div class="page-content">
+        <!-- Judul Form (sekarang di tengah via CSS) -->
+        <div class="form-title">Formulir Identifikasi Bahaya, Penilaian dan Pengendalian Resiko K3</div> 
+        
+        <table class="info-table">
+            <tr><td>Pelaksana / PJ Kegiatan</td><td><%= data.pelaksana %></td></tr>
+            <tr><td>Satker / Satdik</td><td><%= data.satker %></td></tr>
+            <tr><td>Nama Kegiatan</td><td><%= data.namaKegiatan %></td></tr>
+            <tr><td>Lokasi Kegiatan / Survei</td><td><%= data.lokasiKegiatan %></td></tr>
+            <tr><td>Tanggal Penilaian / Survei</td><td><%= data.formatDate(data.tanggalPenilaian) %></td></tr>
+            <tr><td>Rencana Tanggal Kegiatan</td><td><%= data.formatDate(data.tanggalKegiatan) %></td></tr>
+        </table>
+        <table class="data-table">
+            <thead><tr><th class="col-bahaya">Identifikasi Bahaya</th><th class="col-risiko">Risiko</th><th class="col-peluang">Peluang</th><th class="col-akibat">Akibat</th><th class="col-tingkat">Tingkat Risiko</th><th class="col-pengendalian">Pengendalian Risiko</th></tr></thead>
+            <tbody>
+                <% if (data.daftarBahaya && data.daftarBahaya.length > 0) { %>
+                    <% data.daftarBahaya.forEach(item => { %>
+                        <tr><td><%= item.identifikasi %></td><td><%= item.risiko %></td><td style="text-align: center;"><%= item.peluang %></td><td style="text-align: center;"><%= item.akibat %></td><td style="text-align: center; font-weight: bold;"><%= item.tingkatRisiko %></td><td><%= item.pengendalian %></td></tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr><td colspan="6" style="text-align: center;">- Tidak ada data -</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+        
+        <!-- Tabel Kunci Risiko (Footer Form 094) -->
+        <table class="key-table">
+            <tr><th colspan="2">Peluang</th><th colspan="5">Akibat</th><th>Nilai Tingkat Resiko</th><th>Penjelasan Peluang</th><th colspan="2">Penjelasan Akibat</th></tr>
+            <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td></td><td></td><td>Keselamatan Kerja</td><td>Kesehatan Kerja</td></tr>
+            <tr><th>A</th><td>Hampir pasti</td><td>H</td><td>H</td><td>E</td><td>E</td><td>E</td><td>E: Extreme Risk</td><td>A: Hampir pasti akan terjadi</td><td>1: Tidak ada cidera...</td><td>1: Tidak berpotensi...</td></tr>
+            <tr><th>B</th><td>Cenderung</td><td>M</td><td>H</td><td>H</td><td>E</td><td>E</td><td>H: High Risk</td><td>B: Cenderung untuk dapat terjadi</td><td>2: Cidera ringan/P3K...</td><td>2: Timbul gangguan < 7 hr...</td></tr>
+            <tr><th>C</th><td>Mungkin</td><td>L</td><td>M</td><td>H</td><td>E</td><td>E</td><td>M: Moderate Risk</td><td>C: Mungkin dapat terjadi</td><td>3: Hilang hari kerja...</td><td>3: Timbul gangguan 1-4 mg...</td></tr>
+            <tr><th>D</th><td>Kecil kemungkinan</td><td>L</td><td>L</td><td>M</td><td>H</td><td>E</td><td>L: Low Risk</td><td>D: Kecil kemungkinan untuk terjadi</td><td>4: Cacat...</td><td>4: Timbul gangguan 1-3 bln...</td></tr>
+            <tr><th>E</th><td>Sangat jarang</td><td>L</td><td>L</td><td>M</td><td>H</td><td>H</td><td></td><td>E: Sangat jarang terjadi</td><td>5: Fatality...</td><td>5: Timbul gangguan jangka panjang...</td></tr>
+        </table>
+
+        <div class="signature-block">
+            <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
+            <div class="signature-col"><p>Diperiksa</p><div class="signature-box"></div><p class="signature-name">( Ketua Tim K3 )</p></div>
+            <div class="signature-col"><p>Disetujui</p><div class="signature-box"></div><p class="signature-name">( Kabag TU & Umum )</p></div>
+        </div>
+    </div>
+
+    <!-- Konten Halaman 2: Form 095 -->
+    <div style="page-break-before: always;"></div> 
+    <div class="page-content">
+        <!-- Judul Form (sekarang di tengah via CSS) -->
+        <div class="form-title">Formulir Inspeksi Rambu K3</div> 
+        
+        <table class="data-table">
+             <thead><tr><th class="col-rambu">Nama Rambu</th><th class="col-lokasi">Lokasi</th><th class="col-jenis">Jenis</th><th class="col-kondisi">Kondisi Jelas</th><th class="col-kondisi">Kondisi Posisi</th><th class="col-kondisi">Kondisi Bersih</th><th class="col-skor">Total Skor</th><th class="col-hasil">Hasil</th><th class="col-tindakan">Tindakan</th></tr></thead>
+            <tbody>
+                <% if (data.inspeksiRambu && data.inspeksiRambu.length > 0) { %>
+                    <% data.inspeksiRambu.forEach(item => { %>
+                        <tr>
+                            <td><%= item.namaRambu %></td><td><%= item.lokasi %></td><td><%= item.jenisRambu %></td>
+                            <td>A:<%= item.kondisiJelas.jelas_a?'Y':'T' %> B:<%= item.kondisiJelas.jelas_b?'Y':'T' %> C:<%= item.kondisiJelas.jelas_c?'Y':'T' %></td>
+                            <td>A:<%= item.kondisiPosisi.posisi_a?'Y':'T' %> B:<%= item.kondisiPosisi.posisi_b?'Y':'T' %> C:<%= item.kondisiPosisi.posisi_c?'Y':'T' %></td>
+                            <td>A:<%= item.kondisiBersih.bersih_a?'Y':'T' %> B:<%= item.kondisiBersih.bersih_b?'Y':'T' %> C:<%= item.kondisiBersih.bersih_c?'Y':'T' %></td>
+                            <td style="text-align: center; font-weight: bold;"><%= item.totalSkor %></td><td style="text-align: center;"><%= item.hasil %></td><td><%= item.tindakanPerbaikan %></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr><td colspan="9" style="text-align: center;">- Tidak ada data -</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <!-- Tabel Kunci Skor (Footer Form 095) -->
+        <table class="key-table" style="width: 80%; margin-left: auto; margin-right: auto;"> 
+             <tr><th>Indikator</th><th>A</th><th>B</th><th>C</th><th>Skor</th><th>Hasil</th></tr>
+             <tr><td rowspan="1">Jelas Terbaca</td><td>Tulisan utuh</td><td>Tidak pudar</td><td>Bisa dilihat</td><td>50=3; 30=2; 15=1</td><td rowspan="3" style="vertical-align: middle;">Bagus: >= 80<br>Layak: 65-79<br>Perbaikan: < 65</td></tr>
+             <tr><td rowspan="1">Posisi Rambu</td><td>Tepat lokasi</td><td>Tidak bergeser</td><td>Tidak hilang/jatuh</td><td>30=3; 20=2; 10=1</td></tr>
+             <tr><td rowspan="1">Kebersihan</td><td>Bersih</td><td>Tidak berdebu</td><td>Tidak berkarat</td><td>20=3; 10=2; 5=1</td></tr>
+        </table>
+
+        <div class="signature-block">
+            <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
+            <div class="signature-col"><p>Diperiksa</p><div class="signature-box"></div><p class="signature-name">( Ketua Tim K3 )</p></div>
+            <div class="signature-col"><p>Disetujui</p><div class="signature-box"></div><p class="signature-name">( Kabag TU & Umum )</p></div>
+        </div>
+    </div>
+
+</body>
+</html>
