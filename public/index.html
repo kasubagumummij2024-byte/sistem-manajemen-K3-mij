@@ -17,10 +17,10 @@
             <h2>Madrasah Istiqlal Jakarta</h2>
         </header>
 
-        <!-- Bagian Login Admin -->
+        <!-- Bagian Login Admin/Approver -->
         <div id="auth-section">
-            <form id="login-form">
-                <label for="email">Email Admin:</label>
+            <form id="login-form" class="hidden"> <!-- Mulai tersembunyi -->
+                <label for="email">Email:</label>
                 <input type="email" id="email" required>
                 <label for="password">Password:</label>
                 <input type="password" id="password" required>
@@ -30,154 +30,113 @@
                 <p id="user-email"></p>
                 <button id="logout-button" class="btn btn-secondary">Logout</button>
             </div>
-            <div id="auth-status"></div>
+            <div id="auth-status">Memeriksa status login...</div>
         </div>
 
-        <!-- Area Download Petugas (Rekap PDF Bulanan) -->
+        <!-- Area Download Rekap (Admin/Approver) -->
         <div id="admin-area" class="admin-area hidden">
-            <h3>Rekap Laporan PDF Bulanan</h3>
-            <p>Pilih bulan dan tahun untuk mengunduh semua laporan PDF dalam satu file .zip.</p>
-            <div class="rekap-controls">
-                <div class="rekap-select">
-                    <label for="rekap-bulan">Bulan:</label>
-                    <select id="rekap-bulan"></select>
-                </div>
-                <div class="rekap-select">
-                    <label for="rekap-tahun">Tahun:</label>
-                    <select id="rekap-tahun"></select>
-                </div>
-                <button id="download-rekap-pdf-btn" class="btn btn-admin">Download Rekap (.zip)</button>
-            </div>
-            <div id="rekap-status"></div>
+             <h3>Rekap Laporan PDF Bulanan (Admin/Approver)</h3>
+             <p>Pilih bulan dan tahun untuk mengunduh semua laporan PDF dalam satu file .zip.</p>
+             <div class="rekap-controls">
+                 <div class="rekap-select"> <label for="rekap-bulan">Bulan:</label> <select id="rekap-bulan"></select> </div>
+                 <div class="rekap-select"> <label for="rekap-tahun">Tahun:</label> <select id="rekap-tahun"></select> </div>
+                 <button id="download-rekap-pdf-btn" class="btn btn-admin">Download Rekap (.zip)</button>
+             </div>
+             <div id="rekap-status"></div>
         </div>
 
-        <form id="k3-form">
-            
-            <!-- Bagian 1: Informasi Kegiatan -->
-            <fieldset>
-                <legend>1. Informasi Kegiatan</legend>
-                <div class="grid-2">
-                    <div>
-                        <label for="pelaksana">Pelaksana / PJ Kegiatan</label>
-                        <input type="text" id="pelaksana" name="pelaksana" required>
-                    </div>
-                    <div>
-                        <label for="satker">Satker / Satdik</label>
-                        <select id="satker" name="satker" required>
-                            <option value="">Pilih Satker/Satdik...</option>
-                            <option value="KB">KB</option>
-                            <option value="RA">RA</option>
-                            <option value="MI">MI</option>
-                            <option value="MTs">MTs</option>
-                            <option value="MA">MA</option>
-                            <option value="IBS">IBS</option>
-                            <option value="Bag. PM">Bag. PM</option>
-                            <option value="Bag. KHK">Bag. KHK</option>
-                            <option value="Bag. TU & Umum">Bag. TU & Umum</option>
-                        </select>
-                    </div>
+        <!-- (BARU) Bagian Review Laporan (Poin Approval & 6) -->
+        <div id="review-section" class="review-area hidden">
+            <h3>Review Laporan K3 (Approver / Pelaksana)</h3>
+            <p>Daftar laporan yang perlu Anda review atau revisi.</p>
+            <div id="review-list-container">
+                <p>Memuat laporan...</p>
+                <ul id="review-list">
+                    <!-- Daftar laporan akan dimuat di sini oleh JS -->
+                </ul>
+            </div>
+            <div id="review-detail" class="hidden">
+                <h4>Detail Laporan <span id="review-report-id"></span></h4>
+                <div id="review-report-content">
+                    <!-- Detail laporan akan dimuat di sini oleh JS -->
                 </div>
-                <div>
-                    <label for="namaKegiatan">Nama Kegiatan</label>
-                    <input type="text" id="namaKegiatan" name="namaKegiatan" required>
+                <div id="review-actions">
+                    <label for="review-notes">Catatan Approval (wajib jika menolak):</label>
+                    <textarea id="review-notes" rows="3"></textarea>
+                    <div class="action-buttons"></div>
                 </div>
-                
-                <div>
-                    <label for="lokasiKegiatan">Lokasi Kegiatan / Survei</label>
-                    <input type="text" id="lokasiKegiatan" name="lokasiKegiatan" required>
-                </div>
+                 <button id="back-to-list-btn" class="btn btn-secondary" style="margin-top: 1rem;">Kembali ke Daftar</button>
+            </div>
+        </div>
+        
+        <!-- (BARU - Poin 2) Bagian Publik View -->
+        <div id="public-view-section" class="public-area">
+             <h3>Arsip Laporan Publik (Telah Disetujui)</h3>
+             <p>Cari laporan K3 yang sudah disetujui berdasarkan nama kegiatan, pelaksana, atau lokasi.</p>
+             <div class="search-controls">
+                 <input type="text" id="search-term" placeholder="Masukkan kata kunci pencarian...">
+                 <button id="search-btn" class="btn btn-primary">Cari Laporan</button>
+             </div>
+             <div id="public-list-container">
+                 <p id="public-list-status">Memuat data publik... (Pastikan Security Rules diatur)</p>
+                 <ul id="public-list">
+                     <!-- Hasil pencarian akan tampil di sini -->
+                 </ul>
+             </div>
+        </div>
 
+
+        <!-- Form Pengisian Utama -->
+        <form id="k3-form">
+            <fieldset>
+                <!-- (REVISI - Poin 6) Tambahkan id ke legend -->
+                <legend id="form-title">1. Informasi Kegiatan</legend>
                 <div class="grid-2">
-                    <div>
-                        <label for="tanggalPenilaian">Tanggal Penilaian / Survei</label>
-                        <input type="date" id="tanggalPenilaian" name="tanggalPenilaian" required>
-                    </div>
-                    <div>
-                        <label for="tanggalKegiatan">Rencana Tanggal Kegiatan</label>
-                        <input type="date" id="tanggalKegiatan" name="tanggalKegiatan" required>
-                    </div>
+                    <div><label for="pelaksana">Pelaksana / PJ Kegiatan</label><input type="text" id="pelaksana" name="pelaksana" required></div>
+                    <div><label for="satker">Satker / Satdik</label><select id="satker" name="satker" required><option value="">Pilih...</option><option value="KB">KB</option><option value="RA">RA</option><option value="MI">MI</option><option value="MTs">MTs</option><option value="MA">MA</option><option value="IBS">IBS</option><option value="Bag. PM">Bag. PM</option><option value="Bag. KHK">Bag. KHK</option><option value="Bag. TU & Umum">Bag. TU & Umum</option></select></div>
+                </div>
+                <div><label for="namaKegiatan">Nama Kegiatan</label><input type="text" id="namaKegiatan" name="namaKegiatan" required></div>
+                <div><label for="lokasiKegiatan">Lokasi Kegiatan / Survei</label><input type="text" id="lokasiKegiatan" name="lokasiKegiatan" required></div>
+                <div class="grid-2">
+                    <div><label for="tanggalPenilaian">Tanggal Penilaian / Survei</label><input type="date" id="tanggalPenilaian" name="tanggalPenilaian" required></div>
+                    <div><label for="tanggalKegiatan">Rencana Tanggal Kegiatan</label><input type="date" id="tanggalKegiatan" name="tanggalKegiatan" required></div>
                 </div>
             </fieldset>
 
-            <!-- Bagian 2: Identifikasi Bahaya -->
             <fieldset>
-                <legend>2. Identifikasi Bahaya, Penilaian dan Pengendalian Risiko (Form 094)</legend>
-                <div class="table-wrapper">
-                    <table id="bahaya-table">
-                        <thead>
-                            <tr>
-                                <th>Identifikasi Bahaya</th>
-                                <th>Risiko</th>
-                                <th>Peluang (A-E)</th>
-                                <th>Akibat (1-5)</th>
-                                <th>Tingkat Risiko</th>
-                                <th>Pengendalian Risiko</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bahaya-list"></tbody>
-                    </table>
-                </div>
+                <legend>2. Identifikasi Bahaya (Form 094)</legend>
+                <div class="table-wrapper"><table id="bahaya-table"><thead><tr><th>Identifikasi Bahaya</th><th>Risiko</th><th>Peluang (A-E)</th><th>Akibat (1-5)</th><th>Tingkat Risiko</th><th>Pengendalian Risiko</th><th>Aksi</th></tr></thead><tbody id="bahaya-list"></tbody></table></div>
                 <button type="button" id="add-bahaya" class="btn btn-secondary">+ Tambah Baris Bahaya</button>
             </fieldset>
 
-            <!-- Bagian 3: Inspeksi Rambu -->
             <fieldset>
                 <legend>3. Inspeksi Rambu K3 (Form 095)</legend>
-                <div class="table-wrapper wide">
-                    <table id="rambu-table">
-                        <thead>
-                            <tr>
-                                <th>Nama Rambu</th>
-                                <th>Lokasi</th>
-                                <th>Jenis</th>
-                                <th>Kondisi: Jelas Terbaca</th>
-                                <th>Kondisi: Posisi Rambu</th>
-                                <th>Kondisi: Kebersihan</th>
-                                <th>Total Skor</th>
-                                <th>Hasil</th>
-                                <th>Tindakan Perbaikan</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rambu-list"></tbody>
-                    </table>
-                </div>
+                <div class="table-wrapper wide"><table id="rambu-table"><thead><tr><th>Nama Rambu</th><th>Lokasi</th><th>Jenis</th><th>Kondisi: Jelas Terbaca</th><th>Kondisi: Posisi Rambu</th><th>Kondisi: Kebersihan</th><th>Total Skor</th><th>Hasil</th><th>Tindakan Perbaikan</th><th>Aksi</th></tr></thead><tbody id="rambu-list"></tbody></table></div>
                 <button type="button" id="add-rambu" class="btn btn-secondary">+ Tambah Baris Rambu</button>
             </fieldset>
 
-            <!-- Tombol Submit Utama -->
             <div class="submit-area">
                 <button type="submit" id="submit-button" class="btn btn-primary">Submit Laporan</button>
                 <div id="status-message"></div>
             </div>
-
         </form>
     </div>
 
-    <!-- Template untuk Baris Bahaya (Form 094) -->
+    <!-- Template Bahaya -->
     <template id="bahaya-template">
         <tr class="bahaya-row">
             <td><textarea name="identifikasi" rows="3" required></textarea></td>
             <td><textarea name="risiko" rows="3" required></textarea></td>
+            <td><select name="peluang" required><option value="">Pilih</option><option value="A">A: Hampir pasti</option><option value="B">B: Cenderung</option><option value="C">C: Mungkin</option><option value="D">D: Kecil kemungkinan</option><option value="E">E: Sangat jarang</option></select></td>
             <td>
-                <select name="peluang" required>
-                    <option value="">Pilih</option>
-                    <option value="A">A: Hampir pasti</option>
-                    <option value="B">B: Cenderung</option>
-                    <option value="C">C: Mungkin</option>
-                    <option value="D">D: Kecil kemungkinan</option>
-                    <option value="E">E: Sangat jarang</option>
-                </select>
-            </td>
-            <td>
+                <!-- (REVISI - Poin 4) Dropdown Akibat -->
                 <select name="akibat" required>
-                    <option value="">Pilih</option>
-                    <option value="1">1: Tidak ada cidera</option>
-                    <option value="2">2: Cidera ringan</option>
-                    <option value="3">3: Hilang hari kerja</option>
-                    <option value="4">4: Cacat</option>
-                    <option value="5">5: Fatality</option>
+                    <option value="">Pilih Akibat...</option>
+                    <option value="1">1: Tdk Cedera / Tdk Gangguan Kesehatan</option>
+                    <option value="2">2: Cedera Ringan / Gangguan < 7 hari</option>
+                    <option value="3">3: Hilang Hari Kerja / Gangguan 1-4 mg</option>
+                    <option value="4">4: Cacat / Gangguan 1-3 bln</option>
+                    <option value="5">5: Fatality / Gangguan Jangka Panjang</option>
                 </select>
             </td>
             <td><output name="tingkatRisiko" class="risk-output">-</output></td>
@@ -186,34 +145,15 @@
         </tr>
     </template>
 
-    <!-- Template untuk Baris Rambu (Form 095) -->
+    <!-- Template Rambu -->
     <template id="rambu-template">
         <tr class="rambu-row">
             <td><input type="text" name="namaRambu" required></td>
             <td><input type="text" name="lokasi" required></td>
-            <td>
-                <select name="jenisRambu" required>
-                    <option value="">Pilih</option>
-                    <option value="Tempel">Tempel</option>
-                    <option value="Gantung">Gantung</option>
-                    <option value="Berdiri">Berdiri</option>
-                </select>
-            </td>
-            <td class="checkbox-group">
-                <label><input type="checkbox" name="jelas_a"> A. Tulisan Utuh</label>
-                <label><input type="checkbox" name="jelas_b"> B. Tidak Pudar</label>
-                <label><input type="checkbox" name="jelas_c"> C. Bisa Dilihat</label>
-            </td>
-            <td class="checkbox-group">
-                <label><input type="checkbox" name="posisi_a"> A. Tepat Lokasi</label>
-                <label><input type="checkbox" name="posisi_b"> B. Tidak Bergeser</label>
-                <label><input type="checkbox" name="posisi_c"> C. Tidak Hilang/Jatuh</label>
-            </td>
-            <td class="checkbox-group">
-                <label><input type="checkbox" name="bersih_a"> A. Bersih</label>
-                <label><input type="checkbox" name="bersih_b"> B. Tidak Berdebu</label>
-                <label><input type="checkbox" name="bersih_c"> C. Tidak Berkarat</label>
-            </td>
+            <td><select name="jenisRambu" required><option value="">Pilih</option><option value="Tempel">Tempel</option><option value="Gantung">Gantung</option><option value="Berdiri">Berdiri</option></select></td>
+            <td class="checkbox-group"><label><input type="checkbox" name="jelas_a"> A. Tulisan Utuh</label><label><input type="checkbox" name="jelas_b"> B. Tidak Pudar</label><label><input type="checkbox" name="jelas_c"> C. Bisa Dilihat</label></td>
+            <td class="checkbox-group"><label><input type="checkbox" name="posisi_a"> A. Tepat Lokasi</label><label><input type="checkbox" name="posisi_b"> B. Tidak Bergeser</label><label><input type="checkbox" name="posisi_c"> C. Tidak Hilang/Jatuh</label></td>
+            <td class="checkbox-group"><label><input type="checkbox" name="bersih_a"> A. Bersih</label><label><input type="checkbox" name="bersih_b"> B. Tidak Berdebu</label><label><input type="checkbox" name="bersih_c"> C. Tidak Berkarat</label></td>
             <td><output name="totalSkor" class="score-output">0</output></td>
             <td><output name="hasil" class="result-output">-</output></td>
             <td><textarea name="tindakanPerbaikan" rows="3"></textarea></td>
