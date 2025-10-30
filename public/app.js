@@ -11,7 +11,7 @@ const firebaseConfig = {
 };
 
 // --- Tentukan Email Approver ---
-const KETUA_K3_EMAIL = "aguswahyudingumpul@gmail.com";
+const KETUA_K3_EMAIL = "kasubagumum@mij.sch.id";
 const KABAG_TU_EMAIL = "kabagtuumum@mij.sch.id";
 
 // --- Variabel Global ---
