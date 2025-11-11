@@ -5,11 +5,52 @@
     <title>Konten Laporan K3 - <%= data.namaKegiatan %></title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 9pt; line-height: 1.3; color: #333; margin: 0; padding: 0; }
-        .page-content { width: 100%; padding: 0; }
-        .form-title { font-size: 14pt; font-weight: bold; text-align: center; margin: 1rem 0; } /* (POIN 3) Judul di tengah */
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid #999; }
-        .info-table td { padding: 5px 8px; border: 1px solid #999; font-size: 9pt; vertical-align: top;}
-        .info-table td:first-child { font-weight: bold; width: 180px; background-color: #f4f4f4; }
+        
+        /* REVISI BARU: Wrapper untuk setiap halaman, menggantikan margin body */
+        .page-container {
+            width: 100%;
+            padding: 0 25px; /* Sesuaikan dengan margin Puppeteer di index.js */
+            box-sizing: border-box;
+        }
+
+        /* REVISI BARU: CSS untuk Kop Surat (dipindah dari index.js) */
+        .header-table {
+            font-family: Arial, sans-serif; 
+            width: 100%; 
+            margin: 0; /* Hapus margin 40px, gunakan padding .page-container */
+            padding-top: 0; /* Hapus padding-top 10px */
+            box-sizing: border-box; 
+            border-collapse: collapse;
+            margin-bottom: 10px; /* Jarak antara Kop Surat dan Konten */
+        }
+        .header-table .logo-cell { width: 90px; padding: 5px; border: 1px solid #000; vertical-align: middle; text-align: center; }
+        .header-table .center-cell { border-top: 1px solid #000; border-bottom: 1px solid #000; vertical-align: middle; text-align: center; padding: 5px 0; }
+        .header-table .right-cell { width: 180px; padding: 5px 10px; border: 1px solid #000; vertical-align: top; text-align: right; font-size: 10pt; font-weight: bold; }
+        .header-table .title-cell { padding: 10px; border: 1px solid #000; text-align: center; font-size: 12pt; font-weight: bold; }
+        /* AKHIR REVISI CSS KOP SURAT */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 1rem;
+            border: 1px solid #999;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+        .info-grid-item { display: flex; border-bottom: 1px solid #999; }
+        .info-grid-item:nth-child(2n) { border-left: 1px solid #999; }
+        .info-grid-item:nth-last-child(1), 
+        .info-grid-item:nth-last-child(2) { border-bottom: none; }
+        .info-grid-item.full-width { grid-column: span 2; }
+        .info-grid-label {
+            font-weight: bold; width: 130px; flex-shrink: 0;
+            padding: 5px 8px; background-color: #f4f4f4;
+            border-right: 1px solid #999; box-sizing: border-box;
+        }
+        .info-grid-value { flex-grow: 1; padding: 5px 8px; box-sizing: border-box; }
+        .info-grid-value .status { font-size: 9pt; }
+
         .data-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
         .data-table th, .data-table td { border: 1px solid #333; padding: 5px 7px; text-align: left; vertical-align: top; word-wrap: break-word; font-size: 8pt; }
         .data-table th { background-color: #e0e0e0; font-weight: bold; }
@@ -18,6 +59,13 @@
         .key-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 7pt; line-height: 1.2; border: 1px solid #aaa; page-break-inside: avoid; }
         .key-table th, .key-table td { border: 1px solid #aaa; padding: 3px 5px; text-align: left; vertical-align: top; }
         .key-table th { background-color: #f0f0f0; font-weight: bold; }
+        
+        .final-approval-section {
+            margin-top: 1.5rem;
+            page-break-inside: avoid;
+            width: 100%;
+            /* REVISI: Hapus padding, karena .page-container sudah menangani */
+        }
         .approval-info { margin-top: 1.5rem; border: 1px dashed #aaa; padding: 10px; font-size: 8pt; background-color: #f9f9f9; page-break-inside: avoid; }
         .approval-info p { margin: 2px 0; }
         .status { display: inline-block; font-weight: bold; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 8pt; text-transform: uppercase; border: 1px solid;}
@@ -30,29 +78,44 @@
         .signature-col p { margin: 0; padding: 0; font-size: 9pt; }
         .signature-box { height: 50px; margin: .3rem 0; border-bottom: 1px solid #999; }
         .signature-name { font-weight: bold; text-decoration: underline; }
-        /* (BARU - Poin 1) Catatan Kaki Approval */
-        .approval-note { 
-            margin-top: 5px; font-size: 7pt; color: #555; 
-            text-align: left; page-break-inside: avoid;
-        }
+        .approval-note { margin-top: 5px; font-size: 7pt; color: #555; text-align: left; page-break-inside: avoid; }
     </style>
 </head>
 <body>
 
-    <!-- Konten Halaman 1: Form 094 -->
-    <div class="page-content">
-        <div class="form-title">Formulir Identifikasi Bahaya, Penilaian dan Pengendalian Resiko K3</div>
-        <table class="info-table">
-            <tr><td>Pelaksana / PJ</td><td><%= data.pelaksana || '-' %></td></tr>
-            <tr><td>Satker / Satdik</td><td><%= data.satker || '-' %></td></tr>
-            <tr><td>Nama Kegiatan</td><td><%= data.namaKegiatan || '-' %></td></tr>
-            <tr><td>Lokasi Kegiatan</td><td><%= data.lokasiKegiatan || '-' %></td></tr>
-            <tr><td>Tgl Penilaian</td><td><%= formatDate(data.tanggalPenilaian) %></td></tr>
-            <tr><td>Tgl Rencana</td><td><%= formatDate(data.tanggalKegiatan) %></td></tr>
-            <tr><td>Status Laporan</td><td><span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></td></tr>
+    <div class="page-container">
+        
+        <table class="header-table">
+            <tr>
+                <td class="logo-cell">
+                    <img src="<%= logoDataUrl %>" style="width: 70px; height: auto;">
+                </td>
+                <td class="center-cell">
+                    <div style="font-size: 16pt; font-weight: bold; color: #000; margin: 0;">MADRASAH ISTIQLAL JAKARTA</div>
+                    <div style="font-size: 11pt; font-weight: normal; color: #333; margin: 0;">Masjid Istiqlal, Taman Wijaya Kusuma Jakarta Pusat</div>
+                </td>
+                <td class="right-cell">
+                    No. 094/F/BU/01/03/2023
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="title-cell">
+                    Formulir Identifikasi Bahaya, Penilaian dan Pengendalian Resiko K3
+                </td>
+            </tr>
         </table>
+        <div class="info-grid">
+            <div class="info-grid-item"><div class="info-grid-label">Pelaksana / PJ</div><div class="info-grid-value"><%= data.pelaksana || '-' %></div></div>
+            <div class="info-grid-item"><div class="info-grid-label">Satker / Satdik</div><div class="info-grid-value"><%= data.satker || '-' %></div></div>
+            <div class="info-grid-item"><div class="info-grid-label">Nama Kegiatan</div><div class="info-grid-value"><%= data.namaKegiatan || '-' %></div></div>
+            <div class="info-grid-item"><div class="info-grid-label">Lokasi Kegiatan</div><div class="info-grid-value"><%= data.lokasiKegiatan || '-' %></div></div>
+            <div class="info-grid-item"><div class="info-grid-label">Tgl Penilaian</div><div class="info-grid-value"><%= formatDate(data.tanggalPenilaian) %></div></div>
+            <div class="info-grid-item"><div class="info-grid-label">Tgl Rencana</div><div class="info-grid-value"><%= formatDate(data.tanggalKegiatan) %></div></div>
+            <div class="info-grid-item full-width"><div class="info-grid-label" style="width: 130px; border-right: 1px solid #999;">Status Laporan</div><div class="info-grid-value"><span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></div></div>
+        </div>
+
         <table class="data-table">
-             <thead><tr><th class="col-bahaya">Identifikasi Bahaya</th><th class="col-risiko">Risiko</th><th class="col-peluang">Peluang</th><th class="col-akibat">Akibat</th><th class="col-tingkat">Tingkat Risiko</th><th class="col-pengendalian">Pengendalian Risiko</th></tr></thead>
+            <thead><tr><th class="col-bahaya">Identifikasi Bahaya</th><th class="col-risiko">Risiko</th><th class="col-peluang">Peluang</th><th class="col-akibat">Akibat</th><th class="col-tingkat">Tingkat Risiko</th><th class="col-pengendalian">Pengendalian Risiko</th></tr></thead>
             <tbody>
                 <% if (data.daftarBahaya && data.daftarBahaya.length > 0) { %>
                     <% data.daftarBahaya.forEach(item => { %>
@@ -63,73 +126,74 @@
                 <% } %>
             </tbody>
         </table>
-        <table class="key-table"> <!-- Tabel Kunci Risiko (dari Footer Word) -->
-             <tr><th colspan="2">Peluang</th><th colspan="5">Akibat</th><th>Nilai Tingkat Resiko</th><th>Penjelasan Peluang</th><th colspan="2">Penjelasan Akibat</th></tr>
-             <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td></td><td></td><td>Keselamatan Kerja</td><td>Kesehatan Kerja</td></tr>
-             <tr><th>A</th><td>Hampir pasti</td><td>H</td><td>H</td><td>E</td><td>E</td><td>E</td><td>E: Extreme Risk</td><td>A: Hampir pasti</td><td>1: Tdk Cedera...</td><td>1: Tdk potensi...</td></tr>
-             <tr><th>B</th><td>Cenderung</td><td>M</td><td>H</td><td>H</td><td>E</td><td>E</td><td>H: High Risk</td><td>B: Cenderung</td><td>2: Cedera Ringan...</td><td>2: Gangguan < 7 hr...</td></tr>
-             <tr><th>C</th><td>Mungkin</td><td>L</td><td>M</td><td>H</td><td>E</td><td>E</td><td>M: Moderate Risk</td><td>C: Mungkin</td><td>3: Hilang Hari...</td><td>3: Gangguan 1-4 mg...</td></tr>
-             <tr><th>D</th><td>Kecil kemungkinan</td><td>L</td><td>L</td><td>M</td><td>H</td><td>E</td><td>L: Low Risk</td><td>D: Kecil kemungkinan</td><td>4: Cacat...</td><td>4: Gangguan 1-3 bln...</td></tr>
-             <tr><th>E</th><td>Sangat jarang</td><td>L</td><td>L</td><td>M</td><td>H</td><td>H</td><td></td><td>E: Sangat jarang</td><td>5: Fatality...</td><td>5: Gangguan >>...</td></tr>
+        <table class="key-table">
+            <tr><th colspan="2">Peluang</th><th colspan="5">Akibat</th><th>Nilai Tingkat Resiko</th><th>Penjelasan Peluang</th><th colspan="2">Penjelasan Akibat</th></tr>
+            <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td></td><td></td><td>Keselamatan Kerja</td><td>Kesehatan Kerja</td></tr>
+            <tr><th>A</th><td>Hampir pasti</td><td>H</td><td>H</td><td>E</td><td>E</td><td>E</td><td>E: Extreme Risk</td><td>A: Hampir pasti</td><td>1: Tdk Cedera...</td><td>1: Tdk potensi...</td></tr>
+            <tr><th>B</th><td>Cenderung</td><td>M</td><td>H</td><td>H</td><td>E</td><td>E</td><td>H: High Risk</td><td>B: Cenderung</td><td>2: Cedera Ringan...</td><td>2: Gangguan < 7 hr...</td></tr>
+            <tr><th>C</th><td>Mungkin</td><td>L</td><td>M</td><td>H</td><td>E</td><td>E</td><td>M: Moderate Risk</td><td>C: Mungkin</td><td>3: Hilang Hari...</td><td>3: Gangguan 1-4 mg...</td></tr>
+            <tr><th>D</th><td>Kecil kemungkinan</td><td>L</td><td>L</td><td>M</td><td>H</td><td>E</td><td>L: Low Risk</td><td>D: Kecil kemungkinan</td><td>4: Cacat...</td><td>4: Gangguan 1-3 bln...</td></tr>
+            <tr><th>E</th><td>Sangat jarang</td><td>L</td><td>L</td><td>M</td><td>H</td><td>H</td><td></td><td>E: Sangat jarang</td><td>5: Fatality...</td><td>5: Gangguan >>...</td></tr>
         </table>
-         <!-- (REVISI - Poin 1) Informasi Approval -->
-        <div class="approval-info">
-            <p><strong>Status Approval:</strong> <span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></p>
-            <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> <%= data.diperiksaOlehK3_nama %> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
-            <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> <%= data.disetujuiOlehTU_nama %> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
-        </div>
-        <div class="signature-block">
-            <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
-            <div class="signature-col"><p>Diperiksa</p><div class="signature-box"></div><p class="signature-name">( Ketua Tim K3 )</p></div>
-            <div class="signature-col"><p>Disetujui</p><div class="signature-box"></div><p class="signature-name">( Kabag TU & Umum )</p></div>
-        </div>
-        <!-- (BARU - Poin 1) Catatan Kaki Approval -->
-        <% if (data.statusLaporan === 'Approved_TU') { %>
-            <div class="approval-note">
-                Dokumen ini dianggap sah tanpa memerlukan tanda tangan fisik lebih lanjut setelah memperoleh persetujuan dari Kepala Bagian Tata Usaha dan Umum (Kabag TU & Umum).
-            </div>
-        <% } %>
-    </div>
-
-    <!-- Konten Halaman 2: Form 095 -->
-    <div style="page-break-before: always;"></div>
-    <div class="page-content">
-        <div class="form-title">Formulir Inspeksi Rambu K3</div>
-        <table class="data-table">
-             <thead><tr><th class="col-rambu">Nama Rambu</th><th class="col-lokasi">Lokasi</th><th class="col-jenis">Jenis</th><th class="col-kondisi">Kondisi Jelas</th><th class="col-kondisi">Kondisi Posisi</th><th class="col-kondisi">Kondisi Bersih</th><th class="col-skor">Total Skor</th><th class="col-hasil">Hasil</th><th class="col-tindakan">Tindakan</th></tr></thead>
-            <tbody>
-                <% if (data.inspeksiRambu && data.inspeksiRambu.length > 0) { %>
+        
+    </div> <% if (data.inspeksiRambu && data.inspeksiRambu.length > 0) { %>
+        <div style="page-break-before: always;"></div>
+        
+        <div class="page-container">
+            
+            <table class="header-table">
+                <tr>
+                    <td class="logo-cell">
+                        <img src="<%= logoDataUrl %>" style="width: 70px; height: auto;">
+                    </td>
+                    <td class="center-cell">
+                        <div style="font-size: 16pt; font-weight: bold; color: #000; margin: 0;">MADRASAH ISTIQLAL JAKARTA</div>
+                        <div style="font-size: 11pt; font-weight: normal; color: #333; margin: 0;">Masjid Istiqlal, Taman Wijaya Kusuma Jakarta Pusat</div>
+                    </td>
+                    <td class="right-cell">
+                        No. 095/F/BU/00/09/2022
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="title-cell">
+                        Formulir Inspeksi Rambu K3
+                    </td>
+                </tr>
+            </table>
+            <table class="data-table">
+                <thead><tr><th class="col-rambu">Nama Rambu</th><th class="col-lokasi">Lokasi</th><th class="col-jenis">Jenis</th><th class="col-kondisi">Kondisi Jelas</th><th class="col-kondisi">Kondisi Posisi</th><th class="col-kondisi">Kondisi Bersih</th><th class="col-skor">Total Skor</th><th class="col-hasil">Hasil</th><th class="col-tindakan">Tindakan</th></tr></thead>
+                <tbody>
                     <% data.inspeksiRambu.forEach(item => { %>
                         <tr><td><%= item.namaRambu %></td><td><%= item.lokasi %></td><td><%= item.jenisRambu %></td><td>A:<%=item.kondisiJelas.jelas_a?'Y':'T'%> B:<%=item.kondisiJelas.jelas_b?'Y':'T'%> C:<%=item.kondisiJelas.jelas_c?'Y':'T'%></td><td>A:<%=item.kondisiPosisi.posisi_a?'Y':'T'%> B:<%=item.kondisiPosisi.posisi_b?'Y':'T'%> C:<%=item.kondisiPosisi.posisi_c?'Y':'T'%></td><td>A:<%=item.kondisiBersih.bersih_a?'Y':'T'%> B:<%=item.kondisiBersih.bersih_b?'Y':'T'%> C:<%=item.kondisiBersih.bersih_c?'Y':'T'%></td><td style="text-align: center; font-weight: bold;"><%= item.totalSkor %></td><td style="text-align: center;"><%= item.hasil %></td><td><%= item.tindakanPerbaikan %></td></tr>
                     <% }); %>
-                <% } else { %>
-                    <tr><td colspan="9" style="text-align: center;">- Tidak ada data -</td></tr>
-                <% } %>
-            </tbody>
-        </table>
-        <table class="key-table" style="width: 80%; margin-left: auto; margin-right: auto;"> <!-- Tabel Kunci Skor -->
-             <tr><th>Indikator</th><th>A</th><th>B</th><th>C</th><th>Skor</th><th>Hasil</th></tr>
-             <tr><td>Jelas Terbaca</td><td>Tulisan utuh</td><td>Tidak pudar</td><td>Bisa dilihat</td><td>50=3; 30=2; 15=1</td><td rowspan="3" style="vertical-align: middle;">Bagus: >= 80<br>Layak: 65-79<br>Perbaikan: < 65</td></tr>
-             <tr><td>Posisi Rambu</td><td>Tepat lokasi</td><td>Tidak bergeser</td><td>Tidak hilang/jatuh</td><td>30=3; 20=2; 10=1</td></tr>
-             <tr><td>Kebersihan</td><td>Bersih</td><td>Tidak berdebu</td><td>Tidak berkarat</td><td>20=3; 10=2; 5=1</td></tr>
-        </table>
-         <!-- (REVISI - Poin 1) Informasi Approval -->
-        <div class="approval-info">
-            <p><strong>Status Approval:</strong> <span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></p>
-            <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> <%= data.diperiksaOlehK3_nama %> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
-            <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> <%= data.disetujuiOlehTU_nama %> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
-        </div>
-        <div class="signature-block">
-            <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
-            <div class="signature-col"><p>Diperiksa</p><div class="signature-box"></div><p class="signature-name">( Ketua Tim K3 )</p></div>
-            <div class="signature-col"><p>Disetujui</p><div class="signature-box"></div><p class="signature-name">( Kabag TU & Umum )</p></div>
-        </div>
-        <!-- (BARU - Poin 1) Catatan Kaki Approval -->
-        <% if (data.statusLaporan === 'Approved_TU') { %>
-            <div class="approval-note">
-                Dokumen ini dianggap sah tanpa memerlukan tanda tangan fisik lebih lanjut setelah memperoleh persetujuan dari Kepala Bagian Tata Usaha dan Umum (Kabag TU & Umum).
+                </tbody>
+            </table>
+            <table class="key-table" style="width: 80%; margin-left: auto; margin-right: auto;">
+                <tr><th>Indikator</th><th>A</th><th>B</th><th>C</th><th>Skor</th><th>Hasil</th></tr>
+                <tr><td>Jelas Terbaca</td><td>Tulisan utuh</td><td>Tidak pudar</td><td>Bisa dilihat</td><td>50=3; 30=2; 15=1</td><td rowspan="3" style="vertical-align: middle;">Bagus: >= 80<br>Layak: 65-79<br>Perbaikan: < 65</td></tr>
+                <tr><td>Posisi Rambu</td><td>Tepat lokasi</td><td>Tidak bergeser</td><td>Tidak hilang/jatuh</td><td>30=3; 20=2; 10=1</td></tr>
+                <tr><td>Kebersihan</td><td>Bersih</td><td>Tidak berdebu</td><td>Tidak berkarat</td><td>20=3; 10=2; 5=1</td></tr>
+            </table>
+            
+        </div> <% } %> <div class="page-container">
+        <div class="final-approval-section">
+            <div class="approval-info">
+                <p><strong>Status Approval:</strong> <span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></p>
+                <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> <%= data.diperiksaOlehK3_nama %> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
+                <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> <%= data.disetujuiOlehTU_nama %> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
             </div>
-        <% } %>
+            <div class="signature-block">
+                <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
+                <div class="signature-col"><p>Diperiksa</p><div class="signature-box"></div><p class="signature-name">( Ketua Tim K3 )</p></div>
+                <div class="signature-col"><p>Disetujui</p><div class="signature-box"></div><p class="signature-name">( Kabag TU & Umum )</p></div>
+            </div>
+            
+            <% if (data.statusLaporan === 'Approved_TU') { %>
+                <div class="approval-note">
+                    Dokumen ini dianggap sah tanpa memerlukan tanda tangan fisik lebih lanjut setelah memperoleh persetujuan dari Kepala Bagian Tata Usaha dan Umum (Kabag TU & Umum).
+                </div>
+            <% } %>
+        </div> 
     </div>
 
 </body>

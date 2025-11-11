@@ -8,8 +8,83 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS KUSTOM UNTUK HEADER LOGO & EFEK -->
+    <style>
+        .site-header {
+            background-color: var(--bg-card, #FFFFFF);
+            border-bottom: 1px solid var(--border-color, #DEE2E6);
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .header-container {
+            max-width: 900px; /* Menyamai max-width .page-container Anda */
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-group-left img {
+            height: 50px; /* Ukuran logo utama */
+            width: auto;
+        }
+        .logo-group-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; /* Jarak antar logo akreditasi */
+        }
+        .logo-group-right img {
+            height: 32px; /* Ukuran standar logo akreditasi */
+            width: auto;
+        }
+        .accreditation-logo {
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        .accreditation-logo:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+        /* Sembunyikan logo akreditasi di layar kecil */
+        @media (max-width: 768px) {
+            .logo-group-right {
+                display: none;
+            }
+            .logo-group-left img {
+                height: 40px;
+            }
+            .header-container {
+                 max-width: 100%; /* Full width di mobile */
+                 padding: 0 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
+
+    <!-- ===== BAGIAN HEADER LOGO BARU ===== -->
+    <header class="site-header">
+        <div class="header-container">
+            <!-- Logo Kiri: Utama -->
+            <div class="logo-group-left">
+                <!-- Path /images/.. akan bekerja karena server menyajikan 'public' -->
+                <img src="/images/logo-mij.png" alt="Logo MIJ" 
+                     onerror="this.src='https://placehold.co/150x50/f8fafc/0f172a?text=Logo+MIJ'; this.onerror=null;">
+            </div>
+            
+            <!-- Logo Kanan: Akreditasi -->
+            <div class="logo-group-right">
+                <img src="/images/logo-cambridge.png" alt="Cambridge" class="accreditation-logo" title="Cambridge International School">
+                <img src="/images/logo-iso.png" alt="ISO 9001" class="accreditation-logo" title="Quality Approved ISO 9001">
+                <img src="/images/logo-dgi.png" alt="DGI Cert" class="accreditation-logo" title="DGI Cert ISO 21001:2018">
+                <img src="/images/logo-jasanz.png" alt="JAS-ANZ" class="accreditation-logo" style="height: 28px;" title="JAS-ANZ">
+                <img src="/images/logo-iaf.png" alt="IAF" class="accreditation-logo" style="height: 28px;" title="International Accreditation Forum">
+            </div>
+        </div>
+    </header>
+    <!-- ===== AKHIR BAGIAN HEADER LOGO BARU ===== -->
+
 
     <div class="page-container">
         <header class="page-header">
@@ -20,7 +95,7 @@
         <div id="main-content" class="hidden">
             <section class="auth-section logged-in">
                  <div id="user-info">
-                    <span id="user-email">email@example.com</span> <button id="logout-button" class="btn btn-secondary btn-sm">Logout</button>
+                     <span id="user-email">email@example.com</span> <button id="logout-button" class="btn btn-secondary btn-sm">Logout</button>
                  </div>
             </section>
 
@@ -35,18 +110,18 @@
             </section>
 
             <section id="review-section" class="review-area section-card"> <h3 id="review-title">Status Laporan Saya / Untuk Direview</h3> <div id="review-list-container">
-                     <ul id="review-list"><p>Memuat laporan...</p></ul>
-                 </div>
-                 <div id="review-detail" class="hidden">
-                     <h4>Detail Laporan <span id="review-report-id"></span></h4>
-                     <div id="review-report-content"></div>
-                     <div id="review-actions">
-                         <label for="review-notes">Catatan:</label>
-                         <textarea id="review-notes" rows="3"></textarea>
-                         <div class="action-buttons"></div>
-                     </div>
-                     <button id="back-to-list-btn" class="btn btn-secondary">Kembali</button>
-                 </div>
+                    <ul id="review-list"><p>Memuat laporan...</p></ul>
+                </div>
+                <div id="review-detail" class="hidden">
+                    <h4>Detail Laporan <span id="review-report-id"></span></h4>
+                    <div id="review-report-content"></div>
+                    <div id="review-actions">
+                        <label for="review-notes">Catatan:</label>
+                        <textarea id="review-notes" rows="3"></textarea>
+                        <div class="action-buttons"></div>
+                    </div>
+                    <button id="back-to-list-btn" class="btn btn-secondary">Kembali</button>
+                </div>
             </section>
 
             <div class="toggle-section">
@@ -97,7 +172,9 @@
                     <div id="status-message"></div>
                 </div>
             </form>
-        </div> <div id="auth-content" class="hidden">
+        </div> 
+        
+        <div id="auth-content" class="hidden">
             <section class="section-card auth-card">
                 <h3 id="auth-card-title">Login</h3> <div id="auth-status-message"></div>
 
@@ -116,7 +193,7 @@
                     <input type="email" id="register-email" required placeholder="email@example.com">
                     <label for="register-password">Password</label>
                     <input type="password" id="register-password" required placeholder="Minimal 6 karakter">
-                     <label for="register-confirm-password">Konfirmasi Password</label>
+                    <label for="register-confirm-password">Konfirmasi Password</label>
                     <input type="password" id="register-confirm-password" required placeholder="Ulangi password">
                     <button type="submit" class="btn btn-primary btn-fullwidth">Registrasi</button>
                     <div class="auth-links">
@@ -125,7 +202,7 @@
                 </form>
 
                 <form id="reset-form" class="hidden">
-                     <p>Masukkan email Anda untuk menerima link reset password.</p>
+                    <p>Masukkan email Anda untuk menerima link reset password.</p>
                     <label for="reset-email">Email</label>
                     <input type="email" id="reset-email" required placeholder="email@example.com">
                     <button type="submit" class="btn btn-primary btn-fullwidth">Kirim Link Reset</button>
@@ -134,7 +211,10 @@
                     </div>
                 </form>
             </section>
-        </div> </div> <template id="bahaya-template">
+        </div> 
+    </div> 
+    
+    <template id="bahaya-template">
         <div class="form-card">
             <div class="card-header">
                 <h4>Item Bahaya</h4>
@@ -162,8 +242,8 @@
              <div class="card-header">
                 <h4>Item Rambu</h4>
                 <button type="button" class="btn-remove" onclick="removeRow(this.closest('.form-card'))">Hapus</button>
-            </div>
-            <div class="card-content">
+             </div>
+             <div class="card-content">
                 <div class="form-grid">
                     <div><label>Nama Rambu</label><input type="text" name="namaRambu" required></div>
                     <div><label>Lokasi</label><input type="text" name="lokasi" required></div>
@@ -202,7 +282,7 @@
                 </div>
                 <label>Tindakan Perbaikan</label>
                 <textarea name="tindakanPerbaikan" rows="3"></textarea>
-            </div>
+             </div>
         </div>
     </template>
 
