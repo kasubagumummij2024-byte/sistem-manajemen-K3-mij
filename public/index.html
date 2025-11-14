@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- CSS KUSTOM UNTUK HEADER LOGO & EFEK -->
     <style>
         .site-header {
             background-color: var(--bg-card, #FFFFFF);
@@ -18,62 +17,50 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .header-container {
-            max-width: 900px; /* Menyamai max-width .page-container Anda */
+            max-width: 900px; 
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .logo-group-left img {
-            height: 50px; /* Ukuran logo utama */
-            width: auto;
-        }
-        .logo-group-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem; /* Jarak antar logo akreditasi */
-        }
-        .logo-group-right img {
-            height: 32px; /* Ukuran standar logo akreditasi */
-            width: auto;
-        }
+        .logo-group-left img { height: 50px; width: auto; }
+        .logo-group-right { display: flex; align-items: center; gap: 1.5rem; }
+        .logo-group-right img { height: 32px; width: auto; }
         .accreditation-logo {
-            filter: grayscale(100%);
-            opacity: 0.6;
-            transition: all 0.3s ease;
+            filter: grayscale(100%); opacity: 0.6; transition: all 0.3s ease;
         }
-        .accreditation-logo:hover {
-            filter: grayscale(0%);
-            opacity: 1;
+        .accreditation-logo:hover { filter: grayscale(0%); opacity: 1; }
+        
+        /* REVISI 1: CSS untuk Dashboard & Tombol Rekap */
+        #dashboard-container {
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px dashed var(--border-color, #DEE2E6);
         }
-        /* Sembunyikan logo akreditasi di layar kecil */
+        .rekap-controls {
+            display: flex;
+            gap: 0.5rem; /* Jarak antar tombol */
+            align-items: center;
+        }
+        /* AKHIR REVISI 1 */
+
         @media (max-width: 768px) {
-            .logo-group-right {
-                display: none;
-            }
-            .logo-group-left img {
-                height: 40px;
-            }
-            .header-container {
-                 max-width: 100%; /* Full width di mobile */
-                 padding: 0 0.5rem;
-            }
+            .logo-group-right { display: none; }
+            .logo-group-left img { height: 40px; }
+            .header-container { max-width: 100%; padding: 0 0.5rem; }
+            /* REVISI 2: Buat tombol rekap rapi di mobile */
+            .rekap-controls { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== BAGIAN HEADER LOGO BARU ===== -->
     <header class="site-header">
         <div class="header-container">
-            <!-- Logo Kiri: Utama -->
             <div class="logo-group-left">
-                <!-- Path /images/.. akan bekerja karena server menyajikan 'public' -->
                 <img src="/images/logo-mij.png" alt="Logo MIJ" 
                      onerror="this.src='https://placehold.co/150x50/f8fafc/0f172a?text=Logo+MIJ'; this.onerror=null;">
             </div>
-            
-            <!-- Logo Kanan: Akreditasi -->
             <div class="logo-group-right">
                 <img src="/images/logo-cambridge.png" alt="Cambridge" class="accreditation-logo" title="Cambridge International School">
                 <img src="/images/logo-iso.png" alt="ISO 9001" class="accreditation-logo" title="Quality Approved ISO 9001">
@@ -83,8 +70,6 @@
             </div>
         </div>
     </header>
-    <!-- ===== AKHIR BAGIAN HEADER LOGO BARU ===== -->
-
 
     <div class="page-container">
         <header class="page-header">
@@ -93,59 +78,63 @@
         </header>
 
         <div id="main-content" class="hidden">
-            <section class="auth-section logged-in">
-                 <div id="user-info">
-                     <span id="user-email">email@example.com</span> <button id="logout-button" class="btn btn-secondary btn-sm">Logout</button>
-                 </div>
-            </section>
-
-            <section id="admin-area" class="admin-area hidden section-card">
-                <h3>Rekap Laporan PDF</h3>
-                <div class="rekap-controls">
-                    <select id="rekap-bulan"></select>
-                    <select id="rekap-tahun"></select>
-                    <button id="download-rekap-pdf-btn" class="btn btn-primary">Download</button>
-                </div>
-                <div id="rekap-status"></div>
-            </section>
-
-            <section id="review-section" class="review-area section-card"> <h3 id="review-title">Status Laporan Saya / Untuk Direview</h3> <div id="review-list-container">
-                    <ul id="review-list"><p>Memuat laporan...</p></ul>
-                </div>
-                <div id="review-detail" class="hidden">
-                    <h4>Detail Laporan <span id="review-report-id"></span></h4>
-                    <div id="review-report-content"></div>
-                    <div id="review-actions">
-                        <label for="review-notes">Catatan:</label>
-                        <textarea id="review-notes" rows="3"></textarea>
-                        <div class="action-buttons"></div>
+            
+            <div id="dashboard-container">
+                <section class="auth-section logged-in">
+                    <div id="user-info">
+                        <span id="user-email">email@example.com</span> <button id="logout-button" class="btn btn-secondary btn-sm">Logout</button>
                     </div>
-                    <button id="back-to-list-btn" class="btn btn-secondary">Kembali</button>
-                </div>
-            </section>
+                </section>
 
-            <div class="toggle-section">
-                <button id="toggle-public-archive-btn" class="btn btn-secondary">Lihat Arsip Laporan Publik</button>
-            </div>
+                <section id="admin-area" class="admin-area hidden section-card">
+                    <h3>Rekap Laporan</h3> 
+                    <div class="rekap-controls">
+                        <select id="rekap-bulan"></select>
+                        <select id="rekap-tahun"></select>
+                        <button id="download-rekap-pdf-btn" class="btn btn-primary">Download PDF</button>
+                        <button id="download-rekap-excel-btn" class="btn btn-secondary">Download Excel</button>
+                    </div>
+                    <div id="rekap-status"></div>
+                </section>
 
-            <section id="public-view-section" class="public-area section-card hidden">
-                <h3>Arsip Laporan Publik (Approved)</h3>
-                <div class="search-controls">
-                    <input type="text" id="search-term" placeholder="Cari Kegiatan, Pelaksana, Lokasi...">
-                    <button id="search-btn" class="btn btn-primary">Cari</button>
+                <section id="review-section" class="review-area section-card"> <h3 id="review-title">Status Laporan Saya / Untuk Direview</h3> <div id="review-list-container">
+                        <ul id="review-list"><p>Memuat laporan...</p></ul>
+                    </div>
+                    <div id="review-detail" class="hidden">
+                        <h4>Detail Laporan <span id="review-report-id"></span></h4>
+                        <div id="review-report-content"></div>
+                        <div id="review-actions">
+                            <label for="review-notes">Catatan:</label>
+                            <textarea id="review-notes" rows="3"></textarea>
+                            <div class="action-buttons"></div>
+                        </div>
+                        <button id="back-to-list-btn" class="btn btn-secondary">Kembali</button>
+                    </div>
+                </section>
+
+                <div class="toggle-section">
+                    <button id="toggle-public-archive-btn" class="btn btn-secondary">Lihat Arsip Laporan Publik</button>
                 </div>
-                <div id="public-list-container">
-                    <p id="public-list-status">Memuat data...</p>
-                    <ul id="public-list"></ul>
-                </div>
-            </section>
+
+                <section id="public-view-section" class="public-area section-card hidden">
+                    <h3>Arsip Laporan Publik (Approved)</h3>
+                    <div class="search-controls">
+                        <input type="text" id="search-term" placeholder="Cari Kegiatan, Pelaksana, Lokasi...">
+                        <button id="search-btn" class="btn btn-primary">Cari</button>
+                    </div>
+                    <div id="public-list-container">
+                        <p id="public-list-status">Memuat data...</p>
+                        <ul id="public-list"></ul>
+                    </div>
+                </section>
+            </div> 
 
             <form id="k3-form">
                 <fieldset class="section-card">
                     <legend id="form-title">1. Informasi Kegiatan</legend>
                     <div class="form-grid">
                         <div><label for="pelaksana">Pelaksana / PJ</label><input type="text" id="pelaksana" name="pelaksana" required></div>
-                        <div><label for="satker">Satker / Satdik</label><select id="satker" name="satker" required><option value="">Pilih...</option><option value="KB">KB</option><option value="RA">RA</option><option value="MI">MI</option><option value="MTs">MTs</option><option value="MA">MA</option><option value="IBS">IBS</option><option value="Bag. PM">Bag. PM</option><option value="Bag. KHK">Bag. KHK</option><option value="Bag. TU & Umum">Bag. TU & Umum</option></select></div>
+                        <div><label for="satker">Satker / Satdik</label><select id="satker" name="satker" required><option value="">Pilih...</option><option value="Kelompok Bermain">Kelompok Bermain</option><option value="Raudhatul Athfal">Raudhatul Athfal</option><option value="Madrasah Ibtidaiyah">Madrasah Ibtidaiyah</option><option value="Madrasah Tsanawiyah">Madrasah Tsanawiyah</option><option value="Madrasah Aliyah">Madrasah Aliyah</option><option value="Istiqlal Boarding School">Istiqlal Boarding School</option><option value="Bag. Penjamin Mutu">Bag. Penjamin Mutu</option><option value="Bag. KHK">Bag. KHK</option><option value="Bag. TU & Umum">Bag. TU & Umum</option></select></div>
                     </div>
                     <div><label for="namaKegiatan">Nama Kegiatan</label><input type="text" id="namaKegiatan" name="namaKegiatan" required></div>
                     <div><label for="lokasiKegiatan">Lokasi Kegiatan / Survei</label><input type="text" id="lokasiKegiatan" name="lokasiKegiatan" required></div>
