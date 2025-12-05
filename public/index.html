@@ -31,7 +31,6 @@
         }
         .accreditation-logo:hover { filter: grayscale(0%); opacity: 1; }
         
-        /* REVISI 1: CSS untuk Dashboard & Tombol Rekap */
         #dashboard-container {
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
@@ -39,17 +38,44 @@
         }
         .rekap-controls {
             display: flex;
-            gap: 0.5rem; /* Jarak antar tombol */
+            gap: 0.5rem;
             align-items: center;
         }
-        /* AKHIR REVISI 1 */
+
+        /* --- TAMBAHAN STYLE UNTUK DETAIL REVIEW (Solusi No. 2) --- */
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .detail-table th, .detail-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .detail-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .detail-header {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        /* --- AKHIR TAMBAHAN STYLE --- */
 
         @media (max-width: 768px) {
             .logo-group-right { display: none; }
             .logo-group-left img { height: 40px; }
             .header-container { max-width: 100%; padding: 0 0.5rem; }
-            /* REVISI 2: Buat tombol rekap rapi di mobile */
             .rekap-controls { flex-wrap: wrap; }
+            /* Agar tabel bisa di-scroll di HP */
+            .table-responsive { overflow-x: auto; } 
         }
     </style>
 </head>
@@ -100,7 +126,7 @@
                     </div>
                     <div id="review-detail" class="hidden">
                         <h4>Detail Laporan <span id="review-report-id"></span></h4>
-                        <div id="review-report-content"></div>
+                        <div id="review-report-content" class="table-responsive"></div>
                         <div id="review-actions">
                             <label for="review-notes">Catatan:</label>
                             <textarea id="review-notes" rows="3"></textarea>
