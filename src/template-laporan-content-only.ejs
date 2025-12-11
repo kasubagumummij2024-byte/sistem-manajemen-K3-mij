@@ -165,8 +165,8 @@
         <div class="final-approval-section">
             <div class="approval-info">
                 <p><strong>Status Approval:</strong> <span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></p>
-                <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> <%= data.diperiksaOlehK3_nama %> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
-                <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> <%= data.disetujuiOlehTU_nama %> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
+                <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
+                <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
             </div>
             <div class="signature-block">
                 <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
@@ -222,8 +222,8 @@
             <div class="final-approval-section">
                 <div class="approval-info">
                     <p><strong>Status Approval:</strong> <span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></p>
-                    <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> <%= data.diperiksaOlehK3_nama %> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
-                    <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> <%= data.disetujuiOlehTU_nama %> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
+                    <% if (data.diperiksaOlehK3_nama) { %><p><strong>Diperiksa Ketua Tim K3:</strong> (<%= formatDate(data.tanggalDiperiksaK3) %>)</p><% if (data.catatanK3) { %><p><em>Catatan K3:</em> <%= data.catatanK3 %></p><% } %><% } %>
+                    <% if (data.disetujuiOlehTU_nama) { %><p><strong>Disetujui Kabag TU & Umum:</strong> (<%= formatDate(data.tanggalDisetujuiTU) %>)</p><% if (data.catatanTU) { %><p><em>Catatan TU:</em> <%= data.catatanTU %></p><% } %><% } %>
                 </div>
                 <div class="signature-block">
                     <div class="signature-col"><p>Pelaksana / PJ Kegiatan</p><div class="signature-box"></div><p class="signature-name">( <%= data.pelaksana %> )</p></div>
