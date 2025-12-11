@@ -89,7 +89,12 @@ app.get('/api/laporan/:id/download', async (req, res) => {
         });
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="laporan-k3-${docId}.pdf"`);
+        
+        // --- PERBAIKAN DI SINI: Cek apakah mode 'preview' atau 'download' ---
+        // Jika ?mode=preview, gunakan 'inline' (tampil di browser). Jika tidak, 'attachment' (download).
+        const disposition = req.query.mode === 'preview' ? 'inline' : 'attachment';
+        res.setHeader('Content-Disposition', `${disposition}; filename="laporan-k3-${docId}.pdf"`);
+        
         res.send(pdfBuffer);
     } catch (error) { console.error('Error generating single PDF:', error); res.status(500).send({ message: 'Gagal membuat PDF', error: error.message });
     } finally { if (browser) await browser.close(); }
@@ -173,7 +178,7 @@ app.get('/api/rekap/pdf-bundle', checkAuth, async (req, res) => {
     }
 });
 
-// --- ENDPOINT BARU UNTUK REKAP EXCEL ---
+// --- ENDPOINT REKAP EXCEL ---
 app.get('/api/rekap/excel-bundle', checkAuth, async (req, res) => {
     console.log(`Rekap EXCEL by: ${req.user.email}`);
     try {
@@ -248,7 +253,6 @@ app.get('/api/rekap/excel-bundle', checkAuth, async (req, res) => {
         res.status(500).send(error.message || 'Gagal membuat rekap Excel');
     }
 });
-// --- AKHIR ENDPOINT EXCEL ---
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => { console.log(`Server K3 MIJ running on http://localhost:${PORT}`); });

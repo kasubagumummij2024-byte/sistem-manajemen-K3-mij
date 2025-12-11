@@ -57,6 +57,31 @@
         .key-table th, .key-table td { border: 1px solid #aaa; padding: 3px 5px; text-align: left; vertical-align: top; }
         .key-table th { background-color: #f0f0f0; font-weight: bold; }
         
+        /* --- STYLE BARU UNTUK KOTAK INVESTIGASI --- */
+        .investigation-box {
+            margin-top: 1rem;
+            width: 100%;
+            border: 1px solid #aaa;
+            padding: 5px;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            background-color: #fff;
+        }
+        .investigation-label {
+            font-weight: bold;
+            font-size: 8pt;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .investigation-content {
+            min-height: 80px; /* Space cukup untuk tulisan tangan */
+            font-size: 9pt;
+            white-space: pre-wrap; /* Agar enter/baris baru terbaca jika diisi sistem */
+        }
+        /* ------------------------------------------- */
+
         .final-approval-section {
             margin-top: 1.5rem;
             page-break-inside: avoid;
@@ -133,6 +158,10 @@
             <tr><th>E</th><td>Sangat jarang</td><td>L</td><td>L</td><td>M</td><td>H</td><td>H</td><td></td><td>E: Sangat jarang</td><td>5: Fatality...</td><td>5: Gangguan >>...</td></tr>
         </table>
         
+        <div class="investigation-box">
+            <div class="investigation-label">Catatan Investigasi: (Risiko lanjutan / Kejadian luar biasa)</div>
+            <div class="investigation-content"><%= data.catatanInvestigasi || '' %></div>
+        </div>
         <div class="final-approval-section">
             <div class="approval-info">
                 <p><strong>Status Approval:</strong> <span class="status status-<%= data.statusLaporan %>"><%= data.statusLaporan ? data.statusLaporan.replace(/_/g,' ') : 'N/A' %></span></p>

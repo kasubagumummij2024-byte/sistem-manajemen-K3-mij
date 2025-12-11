@@ -173,6 +173,7 @@ async function handleSubmitForm(event) {
             pelaksana: formData.get('pelaksana'), satker: formData.get('satker'),
             namaKegiatan: formData.get('namaKegiatan'), lokasiKegiatan: formData.get('lokasiKegiatan'),
             tanggalPenilaian: formData.get('tanggalPenilaian'), tanggalKegiatan: formData.get('tanggalKegiatan'),
+            catatanInvestigasi: formData.get('catatanInvestigasi'),
         };
         const bahayaCards = bahayaListContainer.querySelectorAll(':scope > .form-card'); const bahayaData = [];
         bahayaCards.forEach(card => { bahayaData.push({
@@ -272,7 +273,7 @@ async function handlePasswordReset(e) {
     } catch (error) { console.error("Reset Password Gagal:", error); authStatusMessage.textContent = 'Gagal mengirim email reset: ' + error.message; authStatusMessage.className = 'error'; }
 }
 
-// --- Fungsi Pencarian Publik ---
+// --- Fungsi Pencarian Publik & INTERFACE TOMBOL BARU ---
 async function fetchPublicReports() {
      if (!auth.currentUser || !publicListStatus) return;
      isPublicSearchReady = false;
@@ -286,28 +287,169 @@ async function fetchPublicReports() {
          searchAndDisplayPublicReports(true);
      } catch (error) { console.error("Error fetching public reports:", error); publicListStatus.textContent = 'Gagal memuat data publik.'; publicListStatus.className = 'error'; }
 }
+
 function searchAndDisplayPublicReports(showAll = false) {
     if (!publicListUl || !publicListStatus) return;
     if (!auth.currentUser){ publicListStatus.textContent = 'Silakan login untuk melihat laporan.'; publicListUl.innerHTML = ''; return; }
     if (!isPublicSearchReady) { publicListStatus.textContent = 'Data belum siap...'; return; }
+    
     const searchTerm = searchTermInput ? searchTermInput.value.toLowerCase().trim() : '';
     publicListUl.innerHTML = '';
     const reportsToDisplay = showAll ? allPublicReports : allPublicReports.filter(r => (r.namaKegiatan||'').toLowerCase().includes(searchTerm) || (r.pelaksana||'').toLowerCase().includes(searchTerm) || (r.lokasiKegiatan||'').toLowerCase().includes(searchTerm));
+    
     if (reportsToDisplay.length === 0) { publicListStatus.textContent = showAll ? 'Belum ada laporan publik.' : `Tidak ada hasil untuk "${searchTerm}".`; }
     else { publicListStatus.textContent = ''; }
+    
     const downloadNote = `<span class="download-note">Dokumen ini dianggap sah tanpa memerlukan tanda tangan fisik lebih lanjut setelah memperoleh persetujuan dari Kabag TU & Umum.</span>`;
+    
     reportsToDisplay.forEach(report => {
         const li = document.createElement('li');
+        
+        // REVISI: Tombol Preview sekarang menggunakan ONCLICK ke fungsi previewPdf
+        // agar IDM tidak menyambar link tersebut.
         li.innerHTML = `
-            <div><strong>${report.namaKegiatan || 'Tanpa Nama'}</strong><br>
-            <small>${report.pelaksana || '-'} | ${report.lokasiKegiatan || '-'} | ${formatDate(report.tanggalPenilaian)}</small></div>
-            <div><a href="/api/laporan/${report.id}/download" target="_blank" class="btn btn-secondary btn-sm">PDF</a> ${downloadNote}</div>
+            <div>
+                <strong>${report.namaKegiatan || 'Tanpa Nama'}</strong><br>
+                <small>${report.pelaksana || '-'} | ${report.lokasiKegiatan || '-'} | ${formatDate(report.tanggalPenilaian)}</small>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                <div style="display:flex; gap:5px;">
+                     <button id="btn-preview-${report.id}" onclick="previewPdf('${report.id}')" class="btn btn-info btn-sm text-white" style="display:flex; align-items:center; gap:5px; border:none;">
+                        <i class="fas fa-eye"></i> Preview
+                     </button>
+
+                     <a href="/api/laporan/${report.id}/download" class="btn btn-secondary btn-sm" style="text-decoration:none; display:flex; align-items:center; gap:5px;">
+                        <i class="fas fa-download"></i> PDF
+                     </a>
+                     
+                     <button class="btn btn-warning btn-sm" onclick="bukaModalInvestigasi('${report.id}', '${(report.catatanInvestigasi || '').replace(/'/g, "\\'")}')" style="display:flex; align-items:center; gap:5px;">
+                        <i class="fas fa-search-plus"></i> Investigasi
+                     </button>
+                </div>
+                ${downloadNote}
+            </div>
         `;
         publicListUl.appendChild(li);
      });
 }
 
-// --- Fungsi Review Laporan (REVISI BAGIAN 2A: Penambahan Tombol Review) ---
+// --- LOGIKA MODAL INVESTIGASI (BARU) ---
+// Fungsi membuka modal (dipanggil dari tombol HTML di atas)
+window.bukaModalInvestigasi = function(id, existingNote) {
+    const hiddenId = document.getElementById('investigasiReportId');
+    const textArea = document.getElementById('catatanInvestigasiTextarea');
+    const modalEl = document.getElementById('modalInvestigasi');
+
+    if (hiddenId && textArea && modalEl) {
+        hiddenId.value = id;
+        textArea.value = existingNote || ''; // Isi jika sudah ada catatan sebelumnya
+        
+        // Menggunakan Bootstrap 5 API jika tersedia
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            // Fallback manual jika bootstrap JS bermasalah (tambah class 'show' dan display block)
+            modalEl.classList.add('show');
+            modalEl.style.display = 'block';
+            modalEl.removeAttribute('aria-hidden');
+            // Membuat backdrop gelap manual sederhana
+            let backdrop = document.querySelector('.modal-backdrop');
+            if(!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                document.body.appendChild(backdrop);
+            }
+        }
+    } else {
+        console.error("Elemen modal investigasi tidak ditemukan.");
+    }
+}
+
+// --- FUNGSI BARU: PREVIEW PDF ANTI-IDM ---
+window.previewPdf = async function(id) {
+    const btn = document.getElementById(`btn-preview-${id}`);
+    const originalText = btn ? btn.innerHTML : '';
+    
+    if(btn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        btn.style.pointerEvents = 'none'; // Cegah klik ganda
+    }
+
+    try {
+        // 1. Ambil data PDF secara diam-diam (Fetch) agar tidak dicegat IDM
+        const response = await fetch(`/api/laporan/${id}/download?mode=preview`);
+        
+        if (!response.ok) throw new Error("Gagal mengambil file");
+
+        // 2. Ubah response menjadi Blob (Binary Large Object)
+        const blob = await response.blob();
+
+        // 3. Buat URL palsu yang mengarah ke memori browser
+        const url = window.URL.createObjectURL(blob);
+
+        // 4. Buka URL tersebut di tab baru (Browser akan merender ini sebagai PDF native)
+        window.open(url, '_blank');
+
+        // Note: URL blob akan otomatis dibersihkan browser saat tab ditutup
+    } catch (error) {
+        console.error("Gagal preview:", error);
+        alert("Gagal memuat preview PDF. Coba gunakan tombol Download.");
+    } finally {
+        if(btn) {
+            btn.innerHTML = originalText;
+            btn.style.pointerEvents = 'auto';
+        }
+    }
+}
+
+// Fungsi menyimpan data ke Firestore
+window.simpanInvestigasi = async function() {
+    const id = document.getElementById('investigasiReportId').value;
+    const catatan = document.getElementById('catatanInvestigasiTextarea').value;
+    const btnSimpan = document.querySelector('#modalInvestigasi .btn-primary');
+
+    if(!id) return;
+    if(!catatan.trim()) {
+        alert("Catatan investigasi tidak boleh kosong.");
+        return;
+    }
+
+    try {
+        if(btnSimpan) { btnSimpan.disabled = true; btnSimpan.textContent = 'Menyimpan...'; }
+
+        // Update dokumen di Firestore
+        await db.collection('laporanK3').doc(id).update({
+            catatanInvestigasi: catatan,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Catatan investigasi berhasil disimpan!");
+        
+        // Tutup Modal
+        const modalEl = document.getElementById('modalInvestigasi');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+             const modalInstance = bootstrap.Modal.getInstance(modalEl);
+             if(modalInstance) modalInstance.hide();
+        } else {
+             modalEl.classList.remove('show');
+             modalEl.style.display = 'none';
+             document.querySelector('.modal-backdrop')?.remove();
+        }
+
+        // Refresh Data List
+        fetchPublicReports();
+
+    } catch (error) {
+        console.error("Gagal simpan investigasi:", error);
+        alert("Gagal menyimpan: " + error.message);
+    } finally {
+        if(btnSimpan) { btnSimpan.disabled = false; btnSimpan.textContent = 'Simpan Catatan'; }
+    }
+}
+
+
+// --- Fungsi Review Laporan ---
 function loadReportsForReview() {
     if (!auth.currentUser || !reviewListUl) return;
     if (unsubscribeReviewListener) unsubscribeReviewListener();
@@ -354,7 +496,7 @@ function loadReportsForReview() {
     }, err => { console.error("Review listener error:", err); if (err.code === 'failed-precondition' && reviewListUl) { reviewListUl.innerHTML = '<li>Gagal: Indeks Firestore dibutuhkan. Cek konsol F12 untuk link pembuatan indeks.</li>'; } else if (reviewListUl) { reviewListUl.innerHTML = '<li>Gagal memuat data review.</li>'; } });
 }
 
-// --- Fungsi Load Revisi (REVISI BAGIAN 1: Perbaikan Perhitungan Ulang) ---
+// --- Fungsi Load Revisi ---
 async function loadReportForRevision(event, reportId) {
     if(event) event.stopPropagation();
     try {
@@ -367,17 +509,17 @@ async function loadReportForRevision(event, reportId) {
         k3Form.pelaksana.value = data.pelaksana||''; k3Form.satker.value = data.satker||'';
         k3Form.namaKegiatan.value = data.namaKegiatan||''; k3Form.lokasiKegiatan.value = data.lokasiKegiatan||'';
         k3Form.tanggalPenilaian.value = data.tanggalPenilaian||''; k3Form.tanggalKegiatan.value = data.tanggalKegiatan||'';
+        
+        const catInvField = k3Form.querySelector('[name="catatanInvestigasi"]');
+        if(catInvField) catInvField.value = data.catatanInvestigasi || '';
 
         bahayaListContainer.innerHTML='';
         if(data.daftarBahaya && data.daftarBahaya.length > 0) {
             data.daftarBahaya.forEach(item => { 
-                // PERBAIKAN: Gunakan callback untuk mengisi nilai DAN memanggil setupBahayaListeners
                 addRow('bahaya-template', 'bahaya-list', card => {
                  card.querySelector('[name="identifikasi"]').value = item.identifikasi || ''; card.querySelector('[name="risiko"]').value = item.risiko || '';
                  card.querySelector('[name="peluang"]').value = item.peluang || ''; card.querySelector('[name="akibat"]').value = item.akibat || '';
                  card.querySelector('[name="pengendalian"]').value = item.pengendalian || ''; 
-                 
-                 // PENTING: Panggil fungsi ini agar event listener aktif!
                  setupBahayaListeners(card); 
                 }); 
             });
@@ -386,15 +528,12 @@ async function loadReportForRevision(event, reportId) {
         rambuListContainer.innerHTML='';
         if(data.inspeksiRambu && data.inspeksiRambu.length > 0) {
             data.inspeksiRambu.forEach(item => { 
-                // PERBAIKAN: Gunakan callback untuk mengisi nilai DAN memanggil setupRambuListeners
                 addRow('rambu-template', 'rambu-list', card => {
                  card.querySelector('[name="namaRambu"]').value = item.namaRambu || ''; card.querySelector('[name="lokasi"]').value = item.lokasi || '';
                  card.querySelector('[name="jenisRambu"]').value = item.jenisRambu || ''; card.querySelector('[name="tindakanPerbaikan"]').value = item.tindakanPerbaikan || '';
                  card.querySelector('[name="jelas_a"]').checked=item.kondisiJelas?.jelas_a || false; card.querySelector('[name="jelas_b"]').checked=item.kondisiJelas?.jelas_b || false; card.querySelector('[name="jelas_c"]').checked=item.kondisiJelas?.jelas_c || false;
                  card.querySelector('[name="posisi_a"]').checked=item.kondisiPosisi?.posisi_a || false; card.querySelector('[name="posisi_b"]').checked=item.kondisiPosisi?.posisi_b || false; card.querySelector('[name="posisi_c"]').checked=item.kondisiPosisi?.posisi_c || false;
                  card.querySelector('[name="bersih_a"]').checked=item.kondisiBersih?.bersih_a || false; card.querySelector('[name="bersih_b"]').checked=item.kondisiBersih?.bersih_b || false; card.querySelector('[name="bersih_c"]').checked=item.kondisiBersih?.bersih_c || false;
-                 
-                 // PENTING: Panggil fungsi ini agar perhitungan skor aktif saat checkbox diklik!
                  setupRambuListeners(card);
                 }); 
             });
@@ -407,7 +546,7 @@ async function loadReportForRevision(event, reportId) {
     } catch (e) { alert("Gagal memuat data untuk revisi: " + e.message); console.error(e); }
 }
 
-// --- Fungsi Show Detail & Approval (REVISI BAGIAN 2B: Menampilkan HTML Detail) ---
+// --- Fungsi Show Detail & Approval ---
 async function showReportDetail(rId) {
     if (!reviewDetail || !reviewListContainer || !reviewReportContent || !reviewActions || !reviewReportIdSpan) return;
     currentReviewReportId = rId;
@@ -420,7 +559,6 @@ async function showReportDetail(rId) {
         reviewReportIdSpan.textContent = `(${rId.substring(0,6)}...)`;
         const downloadNote = `<span class="download-note">Dokumen ini dianggap sah tanpa memerlukan tanda tangan fisik lebih lanjut setelah memperoleh persetujuan dari Kabag TU & Umum.</span>`;
         
-        // MEMBANGUN HTML TABEL BAHAYA
         let bahayaHTML = '<p><em>Tidak ada data bahaya.</em></p>';
         if (d.daftarBahaya && d.daftarBahaya.length > 0) {
             bahayaHTML = `<table class="detail-table">
@@ -439,7 +577,6 @@ async function showReportDetail(rId) {
             bahayaHTML += `</tbody></table>`;
         }
 
-        // MEMBANGUN HTML TABEL RAMBU
         let rambuHTML = '<p><em>Tidak ada data rambu.</em></p>';
         if (d.inspeksiRambu && d.inspeksiRambu.length > 0) {
             rambuHTML = `<table class="detail-table">
@@ -462,7 +599,6 @@ async function showReportDetail(rId) {
             rambuHTML += `</tbody></table>`;
         }
 
-        // MENGGABUNGKAN SEMUA KE TAMPILAN
         reviewReportContent.innerHTML = `
             <div style="background: #f9f9f9; padding: 15px; border: 1px solid #eee; border-radius: 8px;">
                 <h3 style="margin-top:0;">${d.namaKegiatan || 'Tanpa Nama'}</h3>
@@ -473,6 +609,13 @@ async function showReportDetail(rId) {
                     <div><small>Lokasi:</small><br>${d.lokasiKegiatan || '-'}</div>
                     <div><small>Tanggal:</small><br>${formatDate(d.tanggalPenilaian)}</div>
                 </div>
+                
+                ${d.catatanInvestigasi ? `
+                    <div style="background: #eef2ff; padding: 10px; margin-bottom: 15px; border: 1px solid #c7d2fe; border-radius: 4px;">
+                        <strong>Catatan Investigasi:</strong><br>
+                        <span style="white-space: pre-wrap;">${d.catatanInvestigasi}</span>
+                    </div>
+                ` : ''}
                 
                 <h4 class="detail-header">1. Daftar Identifikasi Bahaya</h4>
                 ${bahayaHTML}
